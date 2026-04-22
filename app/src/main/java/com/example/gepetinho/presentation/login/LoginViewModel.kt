@@ -23,8 +23,7 @@ class LoginViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 email = email,
-                errorMessage = null,
-                successMessage = null
+                errorMessage = null
             )
         }
     }
@@ -33,8 +32,7 @@ class LoginViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 password = password,
-                errorMessage = null,
-                successMessage = null
+                errorMessage = null
             )
         }
     }
@@ -48,7 +46,6 @@ class LoginViewModel @Inject constructor(
                 it.copy(
                     isLoading = true,
                     errorMessage = null,
-                    successMessage = null
                 )
             }
 
@@ -56,11 +53,11 @@ class LoginViewModel @Inject constructor(
                 email = currentState.email.trim(),
                 password = currentState.password
             ).fold(
-                onSuccess = { message ->
+                onSuccess = { user ->
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            successMessage = message,
+                            user = user,
                             errorMessage = null
                         )
                     }
@@ -69,7 +66,7 @@ class LoginViewModel @Inject constructor(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            successMessage = null,
+                            user = null,
                             errorMessage = throwable.message ?: "Something went wrong."
                         )
                     }

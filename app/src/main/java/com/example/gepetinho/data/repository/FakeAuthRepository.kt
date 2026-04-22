@@ -1,12 +1,13 @@
 package com.example.gepetinho.data.repository
 
 import com.example.gepetinho.domain.repository.AuthRepository
+import com.example.gepetinho.presentation.auth.User
 import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 class FakeAuthRepository @Inject constructor() : AuthRepository {
 
-    override suspend fun login(email: String, password: String): Result<String> {
+    override suspend fun login(email: String, password: String): Result<User> {
         delay(1500)
 
         return when {
@@ -19,7 +20,7 @@ class FakeAuthRepository @Inject constructor() : AuthRepository {
             }
 
             email == VALID_EMAIL && password == VALID_PASSWORD -> {
-                Result.success("Welcome back, $email")
+                Result.success(User("1", "Demo User"))
             }
 
             else -> {

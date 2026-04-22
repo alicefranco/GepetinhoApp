@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.gepetinho.presentation.login.LoginRoute
+import com.example.gepetinho.navigation.GepetinhoRoot
 import com.example.gepetinho.ui.theme.GepetinhoTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -15,7 +15,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GepetinhoTheme {
-                LoginRoute()
+                GepetinhoRoot()
             }
         }
     }

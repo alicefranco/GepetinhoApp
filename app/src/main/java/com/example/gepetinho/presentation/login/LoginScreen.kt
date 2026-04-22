@@ -15,6 +15,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,15 +24,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.gepetinho.presentation.auth.User
 import com.example.gepetinho.ui.theme.GepetinhoTheme
 
 @Composable
 fun LoginRoute(
+    viewModel: LoginViewModel,
+    onLoginSuccess: (User) -> Unit,
 ) {
-    val viewModel: LoginViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.user) {
+        uiState.user?.let { user ->
+            onLoginSuccess(user)
+        }
+    }
 
     LoginScreen(
         uiState = uiState,
@@ -108,14 +116,6 @@ fun LoginScreen(
                 } else {
                     Text("Login")
                 }
-            }
-
-            uiState.successMessage?.let { message ->
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = message,
-                    color = MaterialTheme.colorScheme.primary
-                )
             }
 
             uiState.errorMessage?.let { message ->
