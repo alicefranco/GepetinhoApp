@@ -1,20 +1,17 @@
 package com.example.gepetinho.di
 
-import com.example.gepetinho.data.repository.FakeAuthRepository
-import com.example.gepetinho.domain.repository.AuthRepository
-import dagger.Binds
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AuthModule {
+object AuthModule {
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindAuthRepository(
-        fakeAuthRepository: FakeAuthRepository
-    ): AuthRepository
+    fun provideFirebaseAuth(): FirebaseAuth = FirebaseAuth.getInstance()
 }
