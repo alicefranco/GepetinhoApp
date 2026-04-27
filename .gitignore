@@ -35,4 +35,4 @@ out/
 **/generated/
 
 # Firebase / secrets (if you use them)
-google-services.json
+app/google-services.json

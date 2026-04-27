@@ -129,7 +129,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Use demo@example.com / password123",
+                text = "Sign in with a Firebase email/password account configured for this app.",
                 style = MaterialTheme.typography.bodySmall
             )
         }
