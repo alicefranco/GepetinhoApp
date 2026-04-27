@@ -4,6 +4,8 @@ import com.example.gepetinho.data.local.entity.PokemonDetailsEntity
 import com.example.gepetinho.data.local.entity.PokemonEntity
 import com.example.gepetinho.data.remote.dto.PokemonDetailsDto
 import com.example.gepetinho.data.remote.dto.PokemonListItemDto
+import com.example.gepetinho.domain.model.Pokemon
+import com.example.gepetinho.domain.model.PokemonDetails
 
 fun PokemonListItemDto.toEntity(
     isFavorite: Boolean = false
@@ -47,4 +49,29 @@ private fun String.extractPokemonId(): Int {
     return trimEnd('/')
         .substringAfterLast('/')
         .toInt()
+}
+
+fun PokemonEntity.toDomain(): Pokemon {
+    return Pokemon(
+        id = pokemonId,
+        name = name,
+        imageUrl = imageUrl,
+        isFavorite = isFavorite
+    )
+}
+
+fun PokemonDetailsEntity.toDomain(): PokemonDetails {
+    return PokemonDetails(
+        id = pokemonId,
+        name = name,
+        imageUrl = imageUrl,
+        height = height,
+        weight = weight,
+        baseExperience = baseExperience,
+        types = types
+            .split(",")
+            .map { it.trim() }
+            .filter { it.isNotEmpty() },
+        isFavorite = isFavorite
+    )
 }
