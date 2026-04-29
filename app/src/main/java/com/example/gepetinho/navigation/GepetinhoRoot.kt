@@ -12,7 +12,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.gepetinho.presentation.auth.AuthState
 import com.example.gepetinho.presentation.auth.AuthViewModel
 import com.example.gepetinho.presentation.auth.User
-import com.example.gepetinho.presentation.home.HomeScreen
+import com.example.gepetinho.presentation.list.ListRoute
+import com.example.gepetinho.presentation.list.ListViewModel
 import com.example.gepetinho.presentation.login.LoginRoute
 import com.example.gepetinho.presentation.login.LoginViewModel
 
@@ -34,7 +35,7 @@ fun GepetinhoRoot(
         authGraph(
             onLoginSuccess = { user ->
                 authViewModel.onLoginSuccess(user)
-                navController.navigate(Screen.Home.route) {
+                navController.navigate(Screen.List.route) {
                     popUpTo(Graph.Auth.route) {
                         inclusive = true
                     }
@@ -68,10 +69,15 @@ private fun NavGraphBuilder.mainGraph(
 ) {
     navigation(
         route = Graph.Main.route,
-        startDestination = Screen.Home.route
+        startDestination = Screen.List.route
     ) {
-        composable(route = Screen.Home.route) {
-            HomeScreen(onLogout = onLogout)
+        composable(route = Screen.List.route) {
+            val listViewModel: ListViewModel = hiltViewModel()
+            ListRoute(
+                viewModel = listViewModel,
+                onPokemonClick = {},
+                onLogout = onLogout
+            )
         }
     }
 }
@@ -83,5 +89,5 @@ sealed class Graph(val route: String) {
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
-    data object Home : Screen("home")
+    data object List : Screen("list")
 }
