@@ -1,5 +1,6 @@
 package com.example.gepetinho.presentation.list
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -30,11 +32,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.gepetinho.R
 import com.example.gepetinho.domain.model.Pokemon
 import com.example.gepetinho.ui.theme.GepetinhoTheme
 
@@ -243,8 +247,22 @@ private fun PokemonRow(
                 )
             }
 
-            TextButton(onClick = onFavoriteClick) {
-                Text(text = if (pokemon.isFavorite) "Saved" else "Save")
+            IconButton(onClick = onFavoriteClick) {
+                Image(
+                    painter = painterResource(
+                        id = if (pokemon.isFavorite) {
+                            R.drawable.heart
+                        } else {
+                            R.drawable.heart_outline
+                        }
+                    ),
+                    contentDescription = if (pokemon.isFavorite) {
+                        "Remove favorite"
+                    } else {
+                        "Add favorite"
+                    },
+                    modifier = Modifier.size(26.dp)
+                )
             }
         }
     }
