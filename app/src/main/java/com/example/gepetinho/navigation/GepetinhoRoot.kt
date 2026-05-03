@@ -14,7 +14,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.gepetinho.presentation.auth.AuthState
 import com.example.gepetinho.presentation.auth.AuthViewModel
-import com.example.gepetinho.presentation.auth.User
 import com.example.gepetinho.presentation.details.DetailsRoute
 import com.example.gepetinho.presentation.details.DetailsViewModel
 import com.example.gepetinho.presentation.list.ListRoute
@@ -38,8 +37,8 @@ fun GepetinhoRoot(
         startDestination = startDestination
     ) {
         authGraph(
-            onLoginSuccess = { user ->
-                authViewModel.onLoginSuccess(user)
+            onLoginSuccess = {
+                authViewModel.onLoginSuccess()
                 navController.navigate(Screen.List.route) {
                     popUpTo(Graph.Auth.route) {
                         inclusive = true
@@ -56,7 +55,7 @@ fun GepetinhoRoot(
 }
 
 private fun NavGraphBuilder.authGraph(
-    onLoginSuccess: (User) -> Unit
+    onLoginSuccess: () -> Unit
 ) {
     navigation(
         route = Graph.Auth.route,

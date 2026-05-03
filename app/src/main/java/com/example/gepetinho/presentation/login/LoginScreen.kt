@@ -25,19 +25,18 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.gepetinho.presentation.auth.User
 import com.example.gepetinho.ui.theme.GepetinhoTheme
 
 @Composable
 fun LoginRoute(
     viewModel: LoginViewModel,
-    onLoginSuccess: (User) -> Unit,
+    onLoginSuccess: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.user) {
-        uiState.user?.let { user ->
-            onLoginSuccess(user)
+        uiState.user?.let {
+            onLoginSuccess()
         }
     }
 

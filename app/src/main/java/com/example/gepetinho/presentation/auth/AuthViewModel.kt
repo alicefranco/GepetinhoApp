@@ -14,12 +14,12 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow(
-        authRepository.currentUser()?.let(AuthState::LoggedIn) ?: AuthState.LoggedOut
+        authRepository.currentUser()?.let { AuthState.LoggedIn } ?: AuthState.LoggedOut
     )
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
-    fun onLoginSuccess(user: User) {
-        _authState.value = AuthState.LoggedIn(user)
+    fun onLoginSuccess() {
+        _authState.value = AuthState.LoggedIn
     }
 
     fun logout() {
