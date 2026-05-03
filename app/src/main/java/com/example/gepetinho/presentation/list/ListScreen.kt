@@ -32,12 +32,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.gepetinho.R
 import com.example.gepetinho.domain.model.Pokemon
 import com.example.gepetinho.ui.theme.GepetinhoTheme
@@ -218,16 +219,18 @@ private fun PokemonRow(
         ) {
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = pokemon.id.toString(),
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    fontWeight = FontWeight.Bold
+                AsyncImage(
+                    model = pokemon.imageUrl,
+                    contentDescription = "${pokemon.name} image",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(4.dp),
+                    contentScale = ContentScale.Fit
                 )
             }
 
@@ -310,13 +313,13 @@ private fun ListScreenPreview() {
                     Pokemon(
                         id = 1,
                         name = "bulbasaur",
-                        imageUrl = null,
+                        imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png",
                         isFavorite = true
                     ),
                     Pokemon(
                         id = 4,
                         name = "charmander",
-                        imageUrl = null,
+                        imageUrl = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png",
                         isFavorite = false
                     )
                 )
