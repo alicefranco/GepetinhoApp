@@ -2,27 +2,24 @@ package com.example.gepetinho.data.extensions
 
 import com.example.gepetinho.data.local.entity.PokemonDetailsEntity
 import com.example.gepetinho.data.local.entity.PokemonEntity
+import com.example.gepetinho.data.local.model.PokemonDetailsWithFavorite
+import com.example.gepetinho.data.local.model.PokemonWithFavorite
 import com.example.gepetinho.data.remote.dto.PokemonDetailsDto
 import com.example.gepetinho.data.remote.dto.PokemonListItemDto
 import com.example.gepetinho.domain.model.Pokemon
 import com.example.gepetinho.domain.model.PokemonDetails
 
-fun PokemonListItemDto.toEntity(
-    isFavorite: Boolean = false
-): PokemonEntity {
+fun PokemonListItemDto.toEntity(): PokemonEntity {
     val pokemonId = url.extractPokemonId()
 
     return PokemonEntity(
         pokemonId = pokemonId,
         name = name,
-        imageUrl = pokemonId.toArtworkUrl(),
-        isFavorite = isFavorite
+        imageUrl = pokemonId.toArtworkUrl()
     )
 }
 
-fun PokemonDetailsDto.toEntity(
-    isFavorite: Boolean = false
-): PokemonDetailsEntity {
+fun PokemonDetailsDto.toEntity(): PokemonDetailsEntity {
     return PokemonDetailsEntity(
         pokemonId = id,
         name = name,
@@ -32,8 +29,7 @@ fun PokemonDetailsDto.toEntity(
         baseExperience = baseExperience,
         types = types
             .sortedBy { it.slot }
-            .joinToString(separator = ",") { it.type.name },
-        isFavorite = isFavorite
+            .joinToString(separator = ",") { it.type.name }
     )
 }
 
@@ -51,7 +47,7 @@ private fun String.extractPokemonId(): Int {
         .toInt()
 }
 
-fun PokemonEntity.toDomain(): Pokemon {
+fun PokemonWithFavorite.toDomain(): Pokemon {
     return Pokemon(
         id = pokemonId,
         name = name,
@@ -60,7 +56,7 @@ fun PokemonEntity.toDomain(): Pokemon {
     )
 }
 
-fun PokemonDetailsEntity.toDomain(): PokemonDetails {
+fun PokemonDetailsWithFavorite.toDomain(): PokemonDetails {
     return PokemonDetails(
         id = pokemonId,
         name = name,

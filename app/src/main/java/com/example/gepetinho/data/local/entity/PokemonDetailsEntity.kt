@@ -11,6 +11,5 @@ data class PokemonDetailsEntity(
     val height: Int,
     val weight: Int,
     val baseExperience: Int?,
-    val types: String,
-    val isFavorite: Boolean = false
+    val types: String
 )

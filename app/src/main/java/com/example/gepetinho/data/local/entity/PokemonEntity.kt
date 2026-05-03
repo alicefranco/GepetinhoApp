@@ -7,6 +7,5 @@ import androidx.room.PrimaryKey
 data class PokemonEntity(
     @PrimaryKey val pokemonId: Int,
     val name: String,
-    val imageUrl: String?,
-    val isFavorite: Boolean = false
+    val imageUrl: String?
 )
