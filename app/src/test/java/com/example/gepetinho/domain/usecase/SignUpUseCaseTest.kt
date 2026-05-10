@@ -1,7 +1,7 @@
 package com.example.gepetinho.domain.usecase
 
-import com.example.gepetinho.domain.repository.AuthRepository
 import com.example.gepetinho.presentation.auth.User
+import com.example.gepetinho.testing.FakeAuthRepository
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -39,26 +39,5 @@ class SignUpUseCaseTest {
 
         assertTrue(result.isFailure)
         assertEquals(failure, result.exceptionOrNull())
-    }
-
-    private class FakeAuthRepository(
-        private val signUpResult: Result<User>
-    ) : AuthRepository {
-        var signUpEmail: String? = null
-        var signUpPassword: String? = null
-
-        override suspend fun login(email: String, password: String): Result<User> {
-            error("Not used in this test.")
-        }
-
-        override suspend fun signUp(email: String, password: String): Result<User> {
-            signUpEmail = email
-            signUpPassword = password
-            return signUpResult
-        }
-
-        override fun currentUser(): User? = null
-
-        override fun logout() = Unit
     }
 }

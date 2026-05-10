@@ -1,11 +1,8 @@
 package com.example.gepetinho.domain.usecase
 
 import com.example.gepetinho.domain.model.Pokemon
-import com.example.gepetinho.domain.model.PokemonDetails
-import com.example.gepetinho.domain.repository.PokemonRepository
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.single
+import com.example.gepetinho.testing.FakePokemonRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -31,24 +28,8 @@ class GetPokemonUseCaseTest {
         val repository = FakePokemonRepository(pokemon = pokemon)
         val useCase = GetPokemonUseCase(repository)
 
-        val result = useCase().single()
+        val result = useCase().first()
 
         assertEquals(pokemon, result)
-    }
-
-    private class FakePokemonRepository(
-        private val pokemon: List<Pokemon>
-    ) : PokemonRepository {
-        override fun observePokemon(): Flow<List<Pokemon>> = flowOf(pokemon)
-
-        override fun observePokemonDetails(pokemonId: Int): Flow<PokemonDetails?> {
-            error("Not used in this test.")
-        }
-
-        override suspend fun refreshPokemon(limit: Int, offset: Int) = Unit
-
-        override suspend fun refreshPokemonDetails(pokemonId: Int) = Unit
-
-        override suspend fun toggleFavorite(pokemonId: Int) = Unit
     }
 }
