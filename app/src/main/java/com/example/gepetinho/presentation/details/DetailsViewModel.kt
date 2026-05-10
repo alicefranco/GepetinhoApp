@@ -3,8 +3,8 @@ package com.example.gepetinho.presentation.details
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.gepetinho.domain.repository.PokemonRepository
 import com.example.gepetinho.domain.usecase.GetPokemonDetailsUseCase
+import com.example.gepetinho.domain.usecase.RefreshPokemonDetailsUseCase
 import com.example.gepetinho.domain.usecase.TogglePokemonFavoriteUseCase
 import com.example.gepetinho.navigation.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +23,7 @@ class DetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     getPokemonDetailsUseCase: GetPokemonDetailsUseCase,
     private val togglePokemonFavoriteUseCase: TogglePokemonFavoriteUseCase,
-    private val pokemonRepository: PokemonRepository
+    private val refreshPokemonDetailsUseCase: RefreshPokemonDetailsUseCase
 ) : ViewModel() {
 
     private val pokemonId: Int = checkNotNull(savedStateHandle[Screen.Details.POKEMON_ID_ARG])
@@ -60,7 +60,7 @@ class DetailsViewModel @Inject constructor(
             errorMessage.value = null
 
             runCatching {
-                pokemonRepository.refreshPokemonDetails(pokemonId)
+                refreshPokemonDetailsUseCase(pokemonId)
             }.onFailure {
                 errorMessage.value = "Could not refresh Pokemon details. Showing saved details."
             }
