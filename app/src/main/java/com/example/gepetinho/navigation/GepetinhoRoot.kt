@@ -20,6 +20,8 @@ import com.example.gepetinho.presentation.list.ListRoute
 import com.example.gepetinho.presentation.list.ListViewModel
 import com.example.gepetinho.presentation.login.LoginRoute
 import com.example.gepetinho.presentation.login.LoginViewModel
+import com.example.gepetinho.presentation.signup.SignUpRoute
+import com.example.gepetinho.presentation.signup.SignUpViewModel
 
 @Composable
 fun GepetinhoRoot(
@@ -37,6 +39,7 @@ fun GepetinhoRoot(
         startDestination = startDestination
     ) {
         authGraph(
+            navController = navController,
             onLoginSuccess = {
                 authViewModel.onLoginSuccess()
                 navController.navigate(Screen.List.route) {
@@ -55,6 +58,7 @@ fun GepetinhoRoot(
 }
 
 private fun NavGraphBuilder.authGraph(
+    navController: NavHostController,
     onLoginSuccess: () -> Unit
 ) {
     navigation(
@@ -65,7 +69,19 @@ private fun NavGraphBuilder.authGraph(
             val loginViewModel: LoginViewModel = hiltViewModel()
             LoginRoute(
                 viewModel = loginViewModel,
-                onLoginSuccess = onLoginSuccess
+                onLoginSuccess = onLoginSuccess,
+                onSignUpClick = {
+                    navController.navigate(Screen.SignUp.route)
+                }
+            )
+        }
+
+        composable(route = Screen.SignUp.route) {
+            val signUpViewModel: SignUpViewModel = hiltViewModel()
+            SignUpRoute(
+                viewModel = signUpViewModel,
+                onSignUpSuccess = onLoginSuccess,
+                onLoginClick = navController::popBackStack
             )
         }
     }
@@ -114,6 +130,7 @@ sealed class Graph(val route: String) {
 
 sealed class Screen(val route: String) {
     data object Login : Screen("login")
+    data object SignUp : Screen("signup")
     data object List : Screen("list")
     data object Details : Screen("details/{pokemonId}") {
         const val POKEMON_ID_ARG = "pokemonId"

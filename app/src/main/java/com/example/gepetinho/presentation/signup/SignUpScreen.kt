@@ -1,4 +1,4 @@
-package com.example.gepetinho.presentation.login
+package com.example.gepetinho.presentation.signup
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,35 +29,37 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.gepetinho.ui.theme.GepetinhoTheme
 
 @Composable
-fun LoginRoute(
-    viewModel: LoginViewModel,
-    onLoginSuccess: () -> Unit,
-    onSignUpClick: () -> Unit
+fun SignUpRoute(
+    viewModel: SignUpViewModel,
+    onSignUpSuccess: () -> Unit,
+    onLoginClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(uiState.user) {
         uiState.user?.let {
-            onLoginSuccess()
+            onSignUpSuccess()
         }
     }
 
-    LoginScreen(
+    SignUpScreen(
         uiState = uiState,
         onEmailChanged = viewModel::onEmailChanged,
         onPasswordChanged = viewModel::onPasswordChanged,
-        onLoginClick = viewModel::login,
-        onSignUpClick = onSignUpClick
+        onConfirmPasswordChanged = viewModel::onConfirmPasswordChanged,
+        onSignUpClick = viewModel::signUp,
+        onLoginClick = onLoginClick
     )
 }
 
 @Composable
-fun LoginScreen(
-    uiState: LoginUiState,
+fun SignUpScreen(
+    uiState: SignUpUiState,
     onEmailChanged: (String) -> Unit,
     onPasswordChanged: (String) -> Unit,
-    onLoginClick: () -> Unit,
+    onConfirmPasswordChanged: (String) -> Unit,
     onSignUpClick: () -> Unit,
+    onLoginClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(modifier = modifier.fillMaxSize()) {
@@ -69,7 +71,7 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Login",
+                text = "Sign up",
                 style = MaterialTheme.typography.headlineMedium
             )
 
@@ -98,6 +100,21 @@ fun LoginScreen(
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Password,
+                    imeAction = ImeAction.Next
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = uiState.confirmPassword,
+                onValueChange = onConfirmPasswordChanged,
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text("Confirm password") },
+                singleLine = true,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Password,
                     imeAction = ImeAction.Done
                 )
             )
@@ -105,8 +122,8 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Button(
-                onClick = onLoginClick,
-                enabled = uiState.isLoginEnabled,
+                onClick = onSignUpClick,
+                enabled = uiState.isSignUpEnabled,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
@@ -117,14 +134,8 @@ fun LoginScreen(
                         strokeWidth = 2.dp
                     )
                 } else {
-                    Text("Login")
+                    Text("Create account")
                 }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            TextButton(onClick = onSignUpClick) {
-                Text("Create account")
             }
 
             uiState.errorMessage?.let { message ->
@@ -135,26 +146,26 @@ fun LoginScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            Text(
-                text = "Sign in with a Firebase email/password account configured for this app.",
-                style = MaterialTheme.typography.bodySmall
-            )
+            TextButton(onClick = onLoginClick) {
+                Text("Already have an account? Login")
+            }
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-private fun LoginScreenPreview() {
+private fun SignUpScreenPreview() {
     GepetinhoTheme {
-        LoginScreen(
-            uiState = LoginUiState(),
+        SignUpScreen(
+            uiState = SignUpUiState(),
             onEmailChanged = {},
             onPasswordChanged = {},
-            onLoginClick = {},
-            onSignUpClick = {}
+            onConfirmPasswordChanged = {},
+            onSignUpClick = {},
+            onLoginClick = {}
         )
     }
 }
