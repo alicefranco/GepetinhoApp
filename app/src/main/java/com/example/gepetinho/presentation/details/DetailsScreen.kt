@@ -154,6 +154,8 @@ fun DetailsScreen(
                             model = pokemon.imageUrl,
                             contentDescription = "${pokemon.name} image",
                             modifier = Modifier.size(180.dp),
+                            placeholder = painterResource(R.drawable.pokemon_image_placeholder),
+                            error = painterResource(R.drawable.pokemon_image_placeholder),
                             contentScale = ContentScale.Fit
                         )
 
