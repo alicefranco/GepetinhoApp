@@ -7,5 +7,7 @@ data class ListUiState(
     val searchQuery: String = "",
     val showFavoritesOnly: Boolean = false,
     val isLoading: Boolean = false,
+    val isLoadingNextPage: Boolean = false,
+    val canLoadMore: Boolean = true,
     val errorMessage: String? = null
 )

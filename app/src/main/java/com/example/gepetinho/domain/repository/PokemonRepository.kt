@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface PokemonRepository {
     fun observePokemon(): Flow<List<Pokemon>>
     fun observePokemonDetails(pokemonId: Int): Flow<PokemonDetails?>
-    suspend fun refreshPokemon(limit: Int = DEFAULT_PAGE_SIZE, offset: Int = 0)
+    suspend fun refreshPokemon(limit: Int = DEFAULT_PAGE_SIZE, offset: Int = 0): Boolean
     suspend fun refreshPokemonDetails(pokemonId: Int)
     suspend fun toggleFavorite(pokemonId: Int)
 

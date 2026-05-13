@@ -4,79 +4,132 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gepetinho.domain.model.Pokemon
 import com.example.gepetinho.domain.repository.PokemonRepository
+import com.example.gepetinho.domain.repository.PokemonRepository.Companion.DEFAULT_PAGE_SIZE
 import com.example.gepetinho.domain.usecase.GetPokemonUseCase
 import com.example.gepetinho.domain.usecase.TogglePokemonFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
 class ListViewModel @Inject constructor(
-    getPokemonUseCase: GetPokemonUseCase,
+    private val getPokemonUseCase: GetPokemonUseCase,
     private val togglePokemonFavoriteUseCase: TogglePokemonFavoriteUseCase,
     private val pokemonRepository: PokemonRepository
 ) : ViewModel() {
 
-    private val searchQuery = MutableStateFlow("")
-    private val showFavoritesOnly = MutableStateFlow(false)
-    private val isLoading = MutableStateFlow(false)
-    private val errorMessage = MutableStateFlow<String?>(null)
+    private val _uiState = MutableStateFlow(ListUiState(isLoading = false))
+    val uiState: StateFlow<ListUiState> = _uiState
 
-    val uiState: StateFlow<ListUiState> = combine(
-        getPokemonUseCase()
-            .catch {
-                errorMessage.value = "Could not load saved Pokemon."
-                emit(emptyList())
-            },
-        searchQuery,
-        showFavoritesOnly,
-        isLoading,
-        errorMessage
-    ) { items, query, favoritesOnly, loading, error ->
-        ListUiState(
-            items = items.filterForUi(query, favoritesOnly),
-            searchQuery = query,
-            showFavoritesOnly = favoritesOnly,
-            isLoading = loading,
-            errorMessage = error
-        )
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000),
-        initialValue = ListUiState(isLoading = true)
-    )
+    private var allPokemon: List<Pokemon> = emptyList()
+    private var nextOffset = 0
 
     init {
+        observePokemon()
         refreshPokemon()
     }
 
+    private fun observePokemon() {
+        viewModelScope.launch {
+            getPokemonUseCase()
+                .catch {
+                    updateError("Could not load saved Pokemon.")
+                    emit(emptyList())
+                }
+                .collect { pokemon ->
+                    allPokemon = pokemon
+                    updateFilteredItems()
+                }
+        }
+    }
+
     fun onSearchQueryChanged(query: String) {
-        searchQuery.value = query
+        _uiState.update {
+            it.copy(searchQuery = query)
+        }
+        updateFilteredItems()
     }
 
     fun onFavoritesOnlyChanged(showOnlyFavorites: Boolean) {
-        showFavoritesOnly.value = showOnlyFavorites
+        _uiState.update {
+            it.copy(showFavoritesOnly = showOnlyFavorites)
+        }
+        updateFilteredItems()
     }
 
     fun refreshPokemon() {
-        viewModelScope.launch {
-            isLoading.value = true
-            errorMessage.value = null
+        if (_uiState.value.isLoading) return
 
-            runCatching {
-                pokemonRepository.refreshPokemon()
-            }.onFailure {
-                errorMessage.value = "Could not refresh Pokemon. Showing saved results."
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoading = true,
+                    errorMessage = null
+                )
             }
 
-            isLoading.value = false
+            runCatching {
+                pokemonRepository.refreshPokemon(
+                    limit = DEFAULT_PAGE_SIZE,
+                    offset = 0
+                )
+            }.onSuccess { hasMore ->
+                nextOffset = DEFAULT_PAGE_SIZE
+
+                _uiState.update {
+                    it.copy(canLoadMore = hasMore)
+                }
+            }.onFailure {
+                updateError("Could not refresh Pokemon.")
+            }
+
+            _uiState.update {
+                it.copy(isLoading = false)
+            }
+        }
+    }
+
+    fun loadNextPage() {
+        val state = _uiState.value
+
+        if (
+            state.isLoading ||
+            state.isLoadingNextPage ||
+            !state.canLoadMore
+        ) return
+
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoadingNextPage = true,
+                    errorMessage = null
+                )
+            }
+
+            val pageOffset = nextOffset
+
+            runCatching {
+                pokemonRepository.refreshPokemon(
+                    limit = DEFAULT_PAGE_SIZE,
+                    offset = pageOffset
+                )
+            }.onSuccess { hasMore ->
+                nextOffset += DEFAULT_PAGE_SIZE
+
+                _uiState.update {
+                    it.copy(canLoadMore = hasMore)
+                }
+            }.onFailure {
+                updateError("Could not load more Pokemon.")
+            }
+
+            _uiState.update {
+                it.copy(isLoadingNextPage = false)
+            }
         }
     }
 
@@ -85,13 +138,34 @@ class ListViewModel @Inject constructor(
             runCatching {
                 togglePokemonFavoriteUseCase(pokemonId)
             }.onFailure {
-                errorMessage.value = "Could not update favorite."
+                updateError("Could not update favorite.")
             }
         }
     }
 
     fun clearError() {
-        errorMessage.update { null }
+        _uiState.update {
+            it.copy(errorMessage = null)
+        }
+    }
+
+    private fun updateFilteredItems() {
+        val state = _uiState.value
+
+        val filtered = allPokemon.filterForUi(
+            searchQuery = state.searchQuery,
+            showFavoritesOnly = state.showFavoritesOnly
+        )
+
+        _uiState.update {
+            it.copy(items = filtered)
+        }
+    }
+
+    private fun updateError(message: String) {
+        _uiState.update {
+            it.copy(errorMessage = message)
+        }
     }
 }
 

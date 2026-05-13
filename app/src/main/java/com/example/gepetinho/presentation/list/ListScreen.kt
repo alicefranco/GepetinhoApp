@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,7 +29,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -59,6 +63,7 @@ fun ListRoute(
         onPokemonClick = onPokemonClick,
         onFavoriteClick = viewModel::toggleFavorite,
         onRetryClick = viewModel::refreshPokemon,
+        onLoadNextPage = viewModel::loadNextPage,
         onDismissError = viewModel::clearError,
         onLogout = onLogout,
         modifier = modifier
@@ -74,6 +79,7 @@ fun ListScreen(
     onPokemonClick: (Int) -> Unit,
     onFavoriteClick: (Int) -> Unit,
     onRetryClick: () -> Unit,
+    onLoadNextPage: () -> Unit,
     onDismissError: () -> Unit,
     onLogout: () -> Unit,
     modifier: Modifier = Modifier
@@ -178,7 +184,29 @@ fun ListScreen(
                 }
 
                 else -> {
+                    val listState = rememberLazyListState()
+                    val shouldLoadNextPage by remember(uiState) {
+                        derivedStateOf {
+                            val lastVisibleIndex = listState.layoutInfo.visibleItemsInfo
+                                .lastOrNull()
+                                ?.index
+                                ?: return@derivedStateOf false
+
+                            uiState.canLoadMore &&
+                                !uiState.isLoading &&
+                                !uiState.isLoadingNextPage &&
+                                lastVisibleIndex >= uiState.items.lastIndex - LOAD_MORE_THRESHOLD
+                        }
+                    }
+
+                    LaunchedEffect(shouldLoadNextPage) {
+                        if (shouldLoadNextPage) {
+                            onLoadNextPage()
+                        }
+                    }
+
                     LazyColumn(
+                        state = listState,
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -191,6 +219,22 @@ fun ListScreen(
                                 onClick = { onPokemonClick(pokemon.id) },
                                 onFavoriteClick = { onFavoriteClick(pokemon.id) }
                             )
+                        }
+
+                        if (uiState.isLoadingNextPage) {
+                            item(key = "loading-next-page") {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(28.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -329,8 +373,11 @@ private fun ListScreenPreview() {
             onPokemonClick = {},
             onFavoriteClick = {},
             onRetryClick = {},
+            onLoadNextPage = {},
             onDismissError = {},
             onLogout = {}
         )
     }
 }
+
+private const val LOAD_MORE_THRESHOLD = 6

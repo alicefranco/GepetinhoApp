@@ -132,6 +132,7 @@ class ListScreenTest {
         onPokemonClick: (Int) -> Unit = {},
         onFavoriteClick: (Int) -> Unit = {},
         onRetryClick: () -> Unit = {},
+        onLoadNextPage: () -> Unit = {},
         onDismissError: () -> Unit = {},
         onLogout: () -> Unit = {}
     ) {
@@ -144,6 +145,7 @@ class ListScreenTest {
                     onPokemonClick = onPokemonClick,
                     onFavoriteClick = onFavoriteClick,
                     onRetryClick = onRetryClick,
+                    onLoadNextPage = onLoadNextPage,
                     onDismissError = onDismissError,
                     onLogout = onLogout
                 )

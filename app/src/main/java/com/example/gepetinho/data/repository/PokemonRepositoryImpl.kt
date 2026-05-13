@@ -30,13 +30,14 @@ class PokemonRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun refreshPokemon(limit: Int, offset: Int) {
+    override suspend fun refreshPokemon(limit: Int, offset: Int): Boolean {
         val response = pokemonApiService.getPokemonList(limit = limit, offset = offset)
         val entities = response.results.map { dto ->
             dto.toEntity()
         }
 
         pokemonDao.upsertPokemon(entities)
+        return response.next != null
     }
 
     override suspend fun refreshPokemonDetails(pokemonId: Int) {

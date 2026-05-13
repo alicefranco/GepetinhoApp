@@ -10,7 +10,8 @@ class FakePokemonRepository(
     pokemon: List<Pokemon> = emptyList(),
     details: PokemonDetails? = null,
     private val refreshPokemonFailure: Throwable? = null,
-    private val refreshPokemonDetailsFailure: Throwable? = null
+    private val refreshPokemonDetailsFailure: Throwable? = null,
+    private val hasMorePokemon: Boolean = false
 ) : PokemonRepository {
 
     private val pokemonFlow = MutableStateFlow(pokemon)
@@ -20,6 +21,7 @@ class FakePokemonRepository(
         private set
     var refreshedPokemonDetailsId: Int? = null
         private set
+    val refreshedPokemonPages = mutableListOf<Pair<Int, Int>>()
     var toggledPokemonId: Int? = null
         private set
 
@@ -30,8 +32,10 @@ class FakePokemonRepository(
         return detailsFlow
     }
 
-    override suspend fun refreshPokemon(limit: Int, offset: Int) {
+    override suspend fun refreshPokemon(limit: Int, offset: Int): Boolean {
+        refreshedPokemonPages += limit to offset
         refreshPokemonFailure?.let { throw it }
+        return hasMorePokemon
     }
 
     override suspend fun refreshPokemonDetails(pokemonId: Int) {

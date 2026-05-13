@@ -91,6 +91,26 @@ class ListViewModelTest {
     }
 
     @Test
+    fun `loadNextPage refreshes pokemon with next page offset`() = runTest {
+        val repository = FakePokemonRepository(
+            pokemon = listOf(Pokemon(1, "bulbasaur", null, isFavorite = false)),
+            hasMorePokemon = true
+        )
+        val viewModel = createViewModel(repository)
+        collectUiState(viewModel)
+
+        viewModel.loadNextPage()
+
+        assertEquals(
+            listOf(
+                50 to 0,
+                50 to 50
+            ),
+            repository.refreshedPokemonPages
+        )
+    }
+
+    @Test
     fun `toggleFavorite delegates selected id`() = runTest {
         val repository = FakePokemonRepository(pokemon = emptyList())
         val viewModel = createViewModel(repository)
